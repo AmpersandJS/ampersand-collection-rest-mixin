@@ -1,7 +1,7 @@
 {
   "name": "ampersand-collection-rest-mixin",
   "description": "A mixin for extending ampersand-collection with restful methods.",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "author": "Henrik Joreteg <henrik@andyet.net>",
   "bugs": {
     "url": "https://github.com/ampersandjs/ampersand-collection-rest-mixin/issues"
