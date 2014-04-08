@@ -1,35 +1,33 @@
-# ampersand-collection-underscore-mixin
+# ampersand-collection-rest-mixin
 
-A mixin for extending ampersand-collection with underscore methods.
+A mixin for extending ampersand-collection with restful methods. To make it behave much like Backbone.
 
 ## install
 
 ```
-npm install ampersand-collection-underscore-mixin
+npm install ampersand-collection-rest-mixin
 ```
 
 ## example
 
 ```javascript
 var Collection = require('ampersand-collection');
-var underscoreMixin = require('ampersand-collection-underscore-mixin');
+var underscoreMixin = require('ampersand-collection-rest-mixin');
 
 
 module.exports = Collection.extend(underscoreMixin, {
     sampleMethod: function () {
-        // now we've got underscore methods 
-        // we can call that are applied to models
-        // in the collection.
-        this.filter( ... );
-        this.some( ... );
-        this.each( ... )
+        // now we've got restful methods in our collection
+        this.sync( ... );
+        this.fetch( ... );
+        this.create( ... )
     }
 });
 ```
 
 ## credits
 
-All credit for underscore and this approach in backbone goes to Jeremy Ashkenas and the rest of the Backbone and Underscore authors.
+All credit for this approach in backbone goes to Jeremy Ashkenas and the rest of the Backbone and Underscore authors.
 
 If you like this follow [@HenrikJoreteg](http://twitter.com/henrikjoreteg) on twitter.
 
