@@ -1,4 +1,5 @@
 var sync = require('ampersand-sync');
+var extend = require('extend-object');
 
 
 // Wrap an optional error callback with a fallback error event.
@@ -15,7 +16,7 @@ module.exports = {
     // collection when they arrive. If `reset: true` is passed, the response
     // data will be passed through the `reset` method instead of `set`.
     fetch: function(options) {
-        options = options ? _.clone(options) : {};
+        options = options ? extend({}, options) : {};
         if (options.parse === void 0) options.parse = true;
         var success = options.success;
         var collection = this;
@@ -33,7 +34,7 @@ module.exports = {
     // collection immediately, unless `wait: true` is passed, in which case we
     // wait for the server to agree.
     create: function(model, options) {
-        options = options ? _.clone(options) : {};
+        options = options ? extend({}, options) : {};
         if (!(model = this._prepareModel(model, options))) return false;
         if (!options.wait) this.add(model, options);
         var collection = this;
