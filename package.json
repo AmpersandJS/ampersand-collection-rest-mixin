@@ -7,8 +7,8 @@
     "url": "https://github.com/ampersandjs/ampersand-collection-rest-mixin/issues"
   },
   "dependencies": {
-    "ampersand-sync": "^0.1.3",
-    "extend-object": "^0.1.0"
+    "ampersand-sync": "^1.0.0",
+    "extend-object": "^1.0.0"
   },
   "homepage": "https://github.com/ampersandjs/ampersand-collection-rest-mixin",
   "keywords": [
