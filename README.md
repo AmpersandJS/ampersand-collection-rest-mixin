@@ -1,5 +1,9 @@
 # ampersand-collection-rest-mixin
 
+<!-- starthide -->
+Part of the [Ampersand.js toolkit](http://ampersandjs.com) for building clientside applications.
+<!-- endhide -->
+
 A mixin for extending ampersand-collection with restful methods. To make it behave much like Backbone.
 
 ## install
@@ -28,8 +32,6 @@ module.exports = Collection.extend(underscoreMixin, {
 ## credits
 
 All credit for this approach in backbone goes to Jeremy Ashkenas and the rest of the Backbone and Underscore authors.
-
-If you like this follow [@HenrikJoreteg](http://twitter.com/henrikjoreteg) on twitter.
 
 ## license
 

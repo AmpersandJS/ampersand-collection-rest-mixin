@@ -8,7 +8,7 @@ var wrapError = function(model, options) {
     options.error = function(resp) {
         if (error) error(model, resp, options);
         model.trigger('error', model, resp, options);
-    }
+    };
 };
 
 module.exports = {
@@ -49,5 +49,51 @@ module.exports = {
 
     sync: function() {
         return sync.apply(this, arguments);
+    },
+
+    // Get or fetch a model by Id.
+    getOrFetch: function (id, fetchAll, cb) {
+        if (arguments.length !== 3) {
+            cb = fetchAll;
+            fetchAll = false;
+        }
+        var self = this;
+        var model = this.get(id);
+        if (model) return cb(null, model);
+        function done() {
+            var model = self.get(id);
+            if (model) {
+                if (cb) cb(null, model);
+            } else {
+                cb(new Error('not found'));
+            }
+        }
+        if (fetchAll) {
+            this.fetch({
+                success: done,
+                error: done
+            });
+        } else {
+            this.fetchById(id, cb);
+        }
+    },
+
+    // fetchById: fetches a model and adds it to
+    // collection when fetched.
+    fetchById: function (id, cb) {
+        var self = this;
+        var idObj = {};
+        idObj[this.model.prototype.idAttribute] = id;
+        var model = new this.model(idObj, {collection: this});
+        model.fetch({
+            success: function () {
+                self.add(model);
+                if (cb) cb(null, model);
+            },
+            error: function () {
+                delete model.collection;
+                if (cb) cb(Error('not found'));
+            }
+        });
     }
 };
