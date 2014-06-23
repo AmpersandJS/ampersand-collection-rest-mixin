@@ -52,10 +52,10 @@ module.exports = {
     },
 
     // Get or fetch a model by Id.
-    getOrFetch: function (id, fetchAll, cb) {
+    getOrFetch: function (id, options, cb) {
         if (arguments.length !== 3) {
-            cb = fetchAll;
-            fetchAll = false;
+            cb = options;
+            options = {};
         }
         var self = this;
         var model = this.get(id);
@@ -68,7 +68,7 @@ module.exports = {
                 cb(new Error('not found'));
             }
         }
-        if (fetchAll) {
+        if (options.all) {
             this.fetch({
                 success: done,
                 error: done
