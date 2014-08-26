@@ -16,10 +16,10 @@ npm install ampersand-collection-rest-mixin
 
 ```javascript
 var Collection = require('ampersand-collection');
-var underscoreMixin = require('ampersand-collection-rest-mixin');
+var restMixin = require('ampersand-collection-rest-mixin');
 
 
-module.exports = Collection.extend(underscoreMixin, {
+module.exports = Collection.extend(restMixin, {
     sampleMethod: function () {
         // now we've got restful methods in our collection
         this.sync( ... );
