@@ -10,6 +10,14 @@ var wrapError = function(model, options) {
         model.trigger('error', model, resp, options);
     };
 };
+var tryParseJSON = function(o){
+
+    // Check if the string is object
+    if (o && typeof o === 'object' && o !== null) {
+        return o;
+    }
+    return false;
+};
 
 module.exports = {
     // Fetch the default set of models for this collection, resetting the
@@ -21,6 +29,10 @@ module.exports = {
         var success = options.success;
         var collection = this;
         options.success = function(resp) {
+            if (!tryParseJSON(resp)){
+                options.error(resp);
+                return false;
+            }
             var method = options.reset ? 'reset' : 'set';
             collection[method](resp, options);
             if (success) success(collection, resp, options);
