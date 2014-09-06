@@ -17,7 +17,8 @@ function endAfter (t, after) {
 
 var Model = AmpersandModel.extend({
     props: {
-        name: 'string'
+        name: 'string',
+        id: 'number'
     },
     sync: function () {
         this.__syncArgs = arguments;
@@ -219,8 +220,7 @@ test('#1412 - Trigger request events.', function (t) {
     collection.off();
 
     collection.on('request', function (obj) {
-        // TODO: this should use `.get(1)` but its not working
-        t.ok(obj === collection.at(0), 'collection has correct request event after one of its models save');
+        t.ok(obj === collection.get(1), 'collection has correct request event after one of its models save');
         end();
     });
     collection.create({id: 1});
@@ -254,8 +254,7 @@ test('#1412 - Trigger sync events.', function (t) {
     collection.off();
 
     collection.on('sync', function (obj) {
-        // TODO: this should use `.get(1)` but its not working
-        t.ok(obj === collection.at(0), 'collection has correct sync event after one of its models save');
+        t.ok(obj === collection.get(1), 'collection has correct sync event after one of its models save');
         end();
     });
     collection.create({id: 1});
