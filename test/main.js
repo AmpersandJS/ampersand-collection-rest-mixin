@@ -117,7 +117,7 @@ test('create', function (t) {
     t.end();
 });
 
-test('create with validate:true enforces validation', 3, function (t) {
+test('create with validate:true enforces validation', function (t) {
     t.plan(3);
 
     var ValidatingModel = Model.extend({
@@ -132,18 +132,12 @@ test('create with validate:true enforces validation', 3, function (t) {
 
     var collection = new ValidatingCollection();
 
-    collection.on('invalid', function (collection, error, options) {
+    collection.on('invalid', function (collection, error) {
         t.equal(error, 'fail');
-        t.equal(options.validationError, 'fail');
     });
 
-    // TODO:
-    // The Backbone test expects it to return false
-    // Is that a behavior we want to change?
-    // t.equal(collection.create({name: 'foo'}, {validate: true}), false);
-    //
-    // Substitue a passing test for now
-    t.equal(collection.create({name: 'foo'}, {validate: true}), collection.at(0));
+    t.equal(collection.create({name: 'foo'}, {validate: true}), false);
+    t.equal(collection.length, 0);
 
     t.end();
 });
