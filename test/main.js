@@ -54,7 +54,7 @@ test('Existence of methods', function (t) {
 // that have to do with REST stuff
 // ============================
 
-test('Fetch', 4, function (t) {
+test('Fetch', function (t) {
     t.plan(4);
 
     var collection = new Collection();
@@ -338,9 +338,7 @@ test('create with wait, model instance, #3028', function (t) {
     var collection = new Collection();
     var model = new Model({id: 1});
     model.sync = function () {
-        // TODO: `this.collection` doesnt seem to be set here
-        // t.equal(this.collection, collection);
-        t.equal(1, 1);
+        t.equal(this.collection, collection);
         t.end();
     };
     collection.create(model, {wait: true});
