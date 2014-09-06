@@ -2,6 +2,7 @@ var test = require('tape');
 var RestCollectionMixins = require('../ampersand-collection-rest-mixin');
 var AmpersandCollection = require('ampersand-collection');
 var AmpersandModel = require('ampersand-model');
+var SuccessSync = require('./lib/success-sync');
 
 
 function endAfter (t, after) {
@@ -218,6 +219,7 @@ test('#1412 - Trigger request events.', function (t) {
     collection.off();
 
     collection.on('request', function (obj) {
+        // TODO: this should use `.get(1)` but its not working
         t.ok(obj === collection.at(0), 'collection has correct request event after one of its models save');
         end();
     });
@@ -226,12 +228,23 @@ test('#1412 - Trigger request events.', function (t) {
 });
 
 test('#1412 - Trigger sync events.', function (t) {
-    t.plan(1);
-    var end = endAfter(t, 1);
+    t.plan(2);
+    var end = endAfter(t, 2);
 
-    var collection = new Collection();
+    // TODO: ampersand-sync would need changes for this to be cleaner
+    // This is only possible by overriding sync in a very hacky way
+    // the Backbone tests accomplish this because `Backbone.ajax` can be
+    // easily redefined
+    var SuccessModel = Model.extend({
+        sync: SuccessSync
+    });
+
+    var SuccessCollection = Collection.extend({
+        sync: SuccessSync,
+        model: SuccessModel
+    });
+    var collection = new SuccessCollection();
     collection.url = '/test';
-    collection.sync = function (method, model, options) { options.success(); };
 
     collection.on('sync', function (obj) {
         t.ok(obj === collection, 'collection has correct sync event after fetching');
@@ -240,13 +253,13 @@ test('#1412 - Trigger sync events.', function (t) {
     collection.fetch();
     collection.off();
 
-    // TODO: does `create` never trigger `sync` on the collection? Should it?
-    // collection.on('sync', function (obj) {
-    //     t.ok(obj === collection.get(0), 'collection has correct sync event after one of its models save');
-    //     end();
-    // });
-    // collection.create({id: 1});
-    // collection.off();
+    collection.on('sync', function (obj) {
+        // TODO: this should use `.get(1)` but its not working
+        t.ok(obj === collection.at(0), 'collection has correct sync event after one of its models save');
+        end();
+    });
+    collection.create({id: 1});
+    collection.off();
 });
 
 test('#1447 - create with wait adds model.', function (t) {
