@@ -1,3 +1,4 @@
+/*$AMPERSAND_VERSION*/
 var sync = require('ampersand-sync');
 var extend = require('extend-object');
 
