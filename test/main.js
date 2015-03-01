@@ -343,3 +343,15 @@ test('create with wait, model instance, #3028', function (t) {
     };
     collection.create(model, {wait: true});
 });
+
+test('fetch call with parameters for ajax call', function (t) {
+    t.plan(1);
+
+    var params = {param1 : 'value1', param2 : 'value2'};
+    var collection = new Collection();
+    collection.url = '/test';
+    collection.fetch({data: params});
+    t.equal(collection.__syncArgs[2].data, params);
+
+    t.end();
+});
