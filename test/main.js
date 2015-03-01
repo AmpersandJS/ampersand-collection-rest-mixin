@@ -355,3 +355,25 @@ test('fetch call with parameters for ajax call', function (t) {
 
     t.end();
 });
+
+test('#15 getOrFetch call with parameters for ajax call', function (t) {
+    t.plan(4);
+
+    var collection = new Collection();
+    var param = {param: 'value'};
+    collection.url = '/test';
+    
+    collection.sync = function (param_method, param_collection, param_options) {
+        t.equal(param_method, 'read');
+        t.equal(param_collection, collection);
+        t.equal(param_options.parse, true);
+        t.equal(param_options.data, param);
+        
+        param_options.success(); 
+    };
+    
+    
+    collection.getOrFetch(1, {all: true, data: param}, function(err, model) {
+        t.end();
+    });
+});
