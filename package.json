@@ -1,7 +1,7 @@
 {
   "name": "ampersand-collection-rest-mixin",
   "description": "A mixin for extending ampersand-collection with restful methods.",
-  "version": "3.0.1",
+  "version": "4.0.0",
   "author": "Henrik Joreteg <henrik@andyet.net>",
   "browserify": {
     "transform": [
