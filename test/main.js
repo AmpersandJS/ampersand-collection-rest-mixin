@@ -2,7 +2,14 @@ var test = require('tape');
 var RestCollectionMixins = require('../ampersand-collection-rest-mixin');
 var AmpersandCollection = require('ampersand-collection');
 var AmpersandModel = require('ampersand-model');
-var SuccessSync = require('./lib/success-sync');
+var Sync = require('ampersand-sync');
+var SuccessSync = function (method, model, options) {
+    options.xhrImplementation = function (xhrOptions) {
+        xhrOptions.success();
+        return {};
+    };
+    return Sync.call(this, method, model, options);
+};
 
 
 function endAfter (t, after) {
@@ -231,10 +238,6 @@ test('#1412 - Trigger sync events.', function (t) {
     t.plan(2);
     var end = endAfter(t, 2);
 
-    // TODO: ampersand-sync would need changes for this to be cleaner
-    // This is only possible by overriding sync in a very hacky way
-    // the Backbone tests accomplish this because `Backbone.ajax` can be
-    // easily redefined
     var SuccessModel = Model.extend({
         sync: SuccessSync
     });
