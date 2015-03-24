@@ -70,10 +70,9 @@ module.exports = {
             }
         }
         if (options.all) {
-            this.fetch({
-                success: done,
-                error: done
-            });
+            options.success = done;
+            options.error = done;
+            this.fetch(options);
         } else {
             this.fetchById(id, cb);
         }
