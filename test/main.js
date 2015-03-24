@@ -3,6 +3,19 @@ var RestCollectionMixins = require('../ampersand-collection-rest-mixin');
 var AmpersandCollection = require('ampersand-collection');
 var AmpersandModel = require('ampersand-model');
 var Sync = require('ampersand-sync');
+
+// headless tape browser does not have Fn.prototype.bind. for real.
+var bind = function bind (fn, ctx){
+    var args = [].slice.call(arguments,2);
+
+    return function(){
+        return fn.apply(ctx, args);
+    };
+};
+
+/* global -Promise */
+var Promise = require('bluebird');
+
 var SuccessSync = function (method, model, options) {
     options.xhrImplementation = function (xhrOptions) {
         xhrOptions.success();
@@ -10,6 +23,19 @@ var SuccessSync = function (method, model, options) {
     };
     return Sync.call(this, method, model, options);
 };
+
+var PromiseSync = function (method, model, options) {
+    options.xhrImplementation = function (xhrOptions) {
+        xhrOptions.success();
+        return {};
+    };
+
+    var boundSync = bind(Sync, this, method, model, options);
+    // emulate syncs that implement a promise for fetch
+    return Promise.resolve(boundSync());
+};
+
+
 
 
 function endAfter (t, after) {
@@ -40,6 +66,8 @@ var Collection = AmpersandCollection.extend(RestCollectionMixins, {
         return RestCollectionMixins.sync.apply(this, arguments);
     }
 });
+
+
 
 
 test('Existence of methods', function (t) {
@@ -124,6 +152,32 @@ test('create', function (t) {
     t.equal(model.collection, collection);
 
     t.end();
+});
+
+test('doing something with the result of the fetch', function(t){
+    t.plan(1);
+
+    var SuccessModel = Model.extend({
+        url: 'http://foo.bar/item',
+        sync: PromiseSync
+    });
+
+    var SuccessCollection = Collection.extend({
+        url: 'http://foo.bar/items',
+        sync: PromiseSync,
+        model: SuccessModel
+    });
+
+    var fetchingStuff = [
+        new SuccessModel().fetch(),
+        new SuccessCollection().fetch(),
+        new SuccessCollection().fetchById(1), 
+        new SuccessCollection().getOrFetch(1)
+    ];
+    Promise.all(fetchingStuff).then(function(data){
+        t.equal(data.length, 4);
+        t.end();
+    });
 });
 
 test('create with validate:true enforces validation', function (t) {

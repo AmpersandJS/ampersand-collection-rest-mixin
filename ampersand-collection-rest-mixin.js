@@ -54,6 +54,7 @@ module.exports = {
 
     // Get or fetch a model by Id.
     getOrFetch: function (id, options, cb) {
+
         if (arguments.length !== 3) {
             cb = options;
             options = {};
@@ -72,9 +73,9 @@ module.exports = {
         if (options.all) {
             options.success = done;
             options.error = done;
-            this.fetch(options);
+            return this.fetch(options);
         } else {
-            this.fetchById(id, cb);
+            return this.fetchById(id, cb);
         }
     },
 
@@ -85,7 +86,7 @@ module.exports = {
         var idObj = {};
         idObj[this.model.prototype.idAttribute] = id;
         var model = new this.model(idObj, {collection: this});
-        model.fetch({
+        return model.fetch({
             success: function () {
                 self.add(model);
                 if (cb) cb(null, model);
