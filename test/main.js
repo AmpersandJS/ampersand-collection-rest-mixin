@@ -346,3 +346,37 @@ test('create with wait, model instance, #3028', function (t) {
     };
     collection.create(model, {wait: true});
 });
+
+test('fetch call with parameters for ajax call', function (t) {
+    t.plan(1);
+
+    var params = {param1 : 'value1', param2 : 'value2'};
+    var collection = new Collection();
+    collection.url = '/test';
+    collection.fetch({data: params});
+    t.equal(collection.__syncArgs[2].data, params);
+
+    t.end();
+});
+
+test('#15 getOrFetch call with parameters for ajax call', function (t) {
+    t.plan(4);
+
+    var collection = new Collection();
+    var param = {param: 'value'};
+    collection.url = '/test';
+    
+    collection.sync = function (param_method, param_collection, param_options) {
+        t.equal(param_method, 'read');
+        t.equal(param_collection, collection);
+        t.equal(param_options.parse, true);
+        t.equal(param_options.data, param);
+        
+        param_options.success(); 
+    };
+    
+    
+    collection.getOrFetch(1, {all: true, data: param}, function (/*err, model*/) {
+        t.end();
+    });
+});
