@@ -53,8 +53,7 @@ module.exports = {
     },
 
     // Get or fetch a model by Id.
-    getOrFetch: function (id, options, cb) {
-
+    getOrFetch: function(id, options, cb) {
         if (arguments.length !== 3) {
             cb = options;
             options = {};
@@ -62,6 +61,7 @@ module.exports = {
         var self = this;
         var model = this.get(id);
         if (model) return cb(null, model);
+
         function done() {
             var model = self.get(id);
             if (model) {
@@ -75,26 +75,30 @@ module.exports = {
             options.error = done;
             return this.fetch(options);
         } else {
-            return this.fetchById(id, cb);
+            return this.fetchById(id, options, cb);
         }
     },
 
     // fetchById: fetches a model and adds it to
     // collection when fetched.
-    fetchById: function (id, cb) {
+    fetchById: function(id, options, cb) {
+        if (arguments.length !== 3) {
+            cb = options;
+            options = {};
+        }
         var self = this;
         var idObj = {};
         idObj[this.model.prototype.idAttribute] = id;
         var model = new this.model(idObj, {collection: this});
-        return model.fetch({
-            success: function () {
+        return model.fetch(assign(options || {}, {
+            success: function() {
                 self.add(model);
                 if (cb) cb(null, model);
             },
-            error: function () {
+            error: function() {
                 delete model.collection;
                 if (cb) cb(Error('not found'));
             }
-        });
+        }));
     }
 };
