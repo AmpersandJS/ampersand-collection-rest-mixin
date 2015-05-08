@@ -119,7 +119,7 @@ test('fetch with an error response triggers an error event', function (t) {
     collection.fetch();
 });
 
-test('noset - disable setting response onto collection', function(t){
+test('set: false - disable setting response onto collection', function(t){
     t.plan(2);
     var end = endAfter(t, 2);
 
@@ -127,8 +127,8 @@ test('noset - disable setting response onto collection', function(t){
     var collection = new Collection();
 
     var opts = {
-        noset: true,
-        success: function (collection, resp, options) {
+        set: false,
+        success: function (collection, resp) {
             t.equal(collection.models.length, 0, 'noset sets no models');
             t.ok(resp);
             end();
