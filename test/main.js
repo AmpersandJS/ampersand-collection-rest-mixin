@@ -119,6 +119,29 @@ test('fetch with an error response triggers an error event', function (t) {
     collection.fetch();
 });
 
+test('noset - disable setting response onto collection', function(t){
+    t.plan(2);
+    var end = endAfter(t, 2);
+
+    var model = new Model({name: 'foo'});
+    var collection = new Collection();
+
+    var opts = {
+        noset: true,
+        success: function (collection, resp, options) {
+            t.equal(collection.models.length, 0, 'noset sets no models');
+            t.ok(resp);
+            end();
+        }
+    };
+    collection.sync = model.sync = function (method, collection, options) {
+        options.success(collection, [], options);
+    };
+
+    collection.fetch(opts);
+
+});
+
 test('ensure fetch only parses once', function (t) {
     t.plan(1);
 
@@ -171,7 +194,7 @@ test('doing something with the result of the fetch', function(t){
     var fetchingStuff = [
         new SuccessModel().fetch(),
         new SuccessCollection().fetch(),
-        new SuccessCollection().fetchById(1), 
+        new SuccessCollection().fetchById(1),
         new SuccessCollection().getOrFetch(1)
     ];
     Promise.all(fetchingStuff).then(function(data){
@@ -419,17 +442,17 @@ test('#15 getOrFetch call with parameters for ajax call', function (t) {
     var collection = new Collection();
     var param = {param: 'value'};
     collection.url = '/test';
-    
+
     collection.sync = function (param_method, param_collection, param_options) {
         t.equal(param_method, 'read');
         t.equal(param_collection, collection);
         t.equal(param_options.parse, true);
         t.equal(param_options.data, param);
-        
-        param_options.success(); 
+
+        param_options.success();
     };
-    
-    
+
+
     collection.getOrFetch(1, {all: true, data: param}, function (/*err, model*/) {
         t.end();
     });

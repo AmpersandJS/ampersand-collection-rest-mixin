@@ -12,6 +12,17 @@ A mixin for extending ampersand-collection with restful methods. To make it beha
 npm install ampersand-collection-rest-mixin
 ```
 
+## api
+- create(model, options)
+- fetch(options)
+    - `reset` [boolean] - executes a `reset` on the collection
+    - `noset` [boolean] - does *not update* collection from GET request.  uses the collection strictly as an api client.  the `success` handler is still triggered. useful in rare circumstances
+    - `success(collection, resp, options)` [function]
+    - `error(model, resp, options)` [function]
+- fetchById(id, cb) - fetches a model and adds it to collection when fetched
+- getOrFetch(id, options, cb) - get or fetch a model by id
+- [sync()](AmpersandJS/ampersand-sync)
+
 ## example
 
 ```javascript
