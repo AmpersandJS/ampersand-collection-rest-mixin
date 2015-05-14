@@ -129,7 +129,7 @@ test('set: false - disable setting response onto collection', function(t){
     var opts = {
         set: false,
         success: function (collection, resp) {
-            t.equal(collection.models.length, 0, 'noset sets no models');
+            t.equal(collection.models.length, 0, '`set: false` does not set models on collection');
             t.ok(resp);
             end();
         }
