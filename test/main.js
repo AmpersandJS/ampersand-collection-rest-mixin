@@ -458,7 +458,7 @@ test('#15 getOrFetch call with parameters for ajax call', function (t) {
     });
 });
 
-test("#28 When fetchByid's model.fetch() returns an error, pass the error details to fetchById's caller", function (t) {
+test('#28 When fetchByid\'s model.fetch() returns an error, pass the error details to fetchById\'s caller', function (t) {
     t.plan(2);
 
     var collection = new Collection();
@@ -469,7 +469,7 @@ test("#28 When fetchByid's model.fetch() returns an error, pass the error detail
             t.equal(res.statusText, 'Bad Request');
             t.end();
         }
-    }
+    };
 
     collection.sync = function (method, model, options) {
         options.error({
@@ -478,4 +478,4 @@ test("#28 When fetchByid's model.fetch() returns an error, pass the error detail
         });
     };
     collection.fetch(options);
-})
+});
