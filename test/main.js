@@ -386,7 +386,7 @@ test('#1939 - `parse` is passed `options`', function (t) {
             }
         },
         parse: function (data, options) {
-            t.equal(options.xhr.ajaxSettings.headers.someHeader, 'headerValue');
+            t.equal(options.xhr.headers.someheader, 'headerValue');
             t.end();
             return data;
         }

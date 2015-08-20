@@ -28,7 +28,12 @@ module.exports = {
             if (options.set !== false) collection.trigger('sync', collection, resp, options);
         };
         wrapError(this, options);
-        return this.sync('read', this, options);
+        var request = this.sync('read', this, options);
+        // Make the request available on the options object so it can be accessed
+        // further down the line by `parse`, sync listeners, etc
+        // https://github.com/AmpersandJS/ampersand-collection-rest-mixin/commit/d32d788aaff912387eb1106f2d7ad183ec39e11a#diff-84c84703169bf5017b1bc323653acaa3R32
+        options.xhr = request;
+        return request;
     },
 
     // Create a new instance of a model in this collection. Add the model to the
