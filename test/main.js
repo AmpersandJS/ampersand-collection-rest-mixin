@@ -465,9 +465,9 @@ test("#28 When fetchByid's model.fetch() returns an error, pass the error detail
 
     var options = {
         error: function (collection, res) {
-            t.ok(res.hasOwnProperty('status'))
-            t.ok(res.hasOwnProperty('statusText'))
-            t.end()
+            t.equal(res.status, 400);
+            t.equal(res.statusText, 'Bad Request');
+            t.end();
         }
     }
 
