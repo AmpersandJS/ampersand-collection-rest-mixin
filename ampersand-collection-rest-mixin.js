@@ -2,7 +2,6 @@
 var sync = require('ampersand-sync');
 var assign = require('lodash.assign');
 
-
 // Wrap an optional error callback with a fallback error event.
 var wrapError = function(model, options) {
     var error = options.error;
@@ -59,14 +58,17 @@ module.exports = {
 
     // Get or fetch a model by Id.
     getOrFetch: function (id, options, cb) {
-
         if (arguments.length !== 3) {
             cb = options;
             options = {};
         }
         var self = this;
         var model = this.get(id);
-        if (model) return cb(null, model);
+        if (model) {
+            return window.setTimeout(function() {
+                return cb(null, model);
+            }, 0);
+        }
         function done() {
             var model = self.get(id);
             if (model) {

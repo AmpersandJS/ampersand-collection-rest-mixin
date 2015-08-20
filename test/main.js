@@ -35,9 +35,6 @@ var PromiseSync = function (method, model, options) {
     return Promise.resolve(boundSync());
 };
 
-
-
-
 function endAfter (t, after) {
     var count = 0;
     return function () {
@@ -66,9 +63,6 @@ var Collection = AmpersandCollection.extend(RestCollectionMixins, {
         return RestCollectionMixins.sync.apply(this, arguments);
     }
 });
-
-
-
 
 test('Existence of methods', function (t) {
     t.plan(5);
@@ -452,7 +446,6 @@ test('#15 getOrFetch call with parameters for ajax call', function (t) {
         param_options.success();
     };
 
-
     collection.getOrFetch(1, {all: true, data: param}, function (/*err, model*/) {
         t.end();
     });
@@ -478,4 +471,26 @@ test('#28 When fetchByid\'s model.fetch() returns an error, pass the error detai
         });
     };
     collection.fetch(options);
+});
+
+test('#13 getOrFetch call with parameters for ajax call', function (t) {
+    t.plan(2);
+
+    var collection = new Collection([{
+        id: 1
+    }]);
+
+    var syncEventCalled = false;
+
+    collection.on('sync-event', function() {
+        t.equal(syncEventCalled, false, 'synchronous event should be called first');
+        syncEventCalled = true;
+    });
+
+    collection.getOrFetch(1, function () {
+        t.equal(syncEventCalled, true, 'sync event should have been called');
+        t.end();
+    });
+
+    collection.trigger('sync-event');
 });
