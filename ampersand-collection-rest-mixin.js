@@ -28,7 +28,9 @@ module.exports = {
             if (options.set !== false) collection.trigger('sync', collection, resp, options);
         };
         wrapError(this, options);
-        return this.sync('read', this, options);
+        var request = this.sync('read', this, options);
+        options.xhr = request;
+        return request;
     },
 
     // Create a new instance of a model in this collection. Add the model to the
