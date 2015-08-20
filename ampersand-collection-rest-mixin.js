@@ -91,9 +91,13 @@ module.exports = {
                 self.add(model);
                 if (cb) cb(null, model);
             },
-            error: function () {
+            error: function (collection, resp) {
                 delete model.collection;
-                if (cb) cb(Error('not found'));
+                if (cb) {
+                    var error = new Error(resp.statusText);
+                    error.status = resp.status;
+                    cb(error);
+                }
             }
         });
     }

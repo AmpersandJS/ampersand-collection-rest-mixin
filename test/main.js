@@ -457,3 +457,25 @@ test('#15 getOrFetch call with parameters for ajax call', function (t) {
         t.end();
     });
 });
+
+test('#28 When fetchByid\'s model.fetch() returns an error, pass the error details to fetchById\'s caller', function (t) {
+    t.plan(2);
+
+    var collection = new Collection();
+
+    var options = {
+        error: function (collection, res) {
+            t.equal(res.status, 400);
+            t.equal(res.statusText, 'Bad Request');
+            t.end();
+        }
+    };
+
+    collection.sync = function (method, model, options) {
+        options.error({
+            status: 400,
+            statusText: 'Bad Request'
+        });
+    };
+    collection.fetch(options);
+});
