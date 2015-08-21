@@ -91,7 +91,7 @@ module.exports = {
     fetchById: function (id, cb) {
         var self = this;
         var idObj = {};
-        idObj[this.model.prototype.idAttribute] = id;
+        idObj[this.mainIndex] = id;
         var model = new this.model(idObj, {collection: this});
         return model.fetch({
             success: function () {
