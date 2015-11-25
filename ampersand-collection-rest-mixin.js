@@ -95,7 +95,7 @@ module.exports = {
         var model = new this.model(idObj, {collection: this});
         return model.fetch({
             success: function () {
-                self.add(model);
+                model = self.add(model);
                 if (cb) cb(null, model);
             },
             error: function (collection, resp) {
