@@ -65,9 +65,7 @@ module.exports = {
         var self = this;
         var model = this.get(id);
         if (model) {
-            return window.setTimeout(function() {
-	            cb(null, model);
-            }, 0);
+            return window.setTimeout(cb.bind(null, null, model), 0);
         }
         if (options.all) {
             options.always = function() {
