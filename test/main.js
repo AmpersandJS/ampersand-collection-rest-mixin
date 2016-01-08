@@ -4,15 +4,6 @@ var AmpersandCollection = require('ampersand-collection');
 var AmpersandModel = require('ampersand-model');
 var Sync = require('ampersand-sync');
 
-// headless tape browser does not have Fn.prototype.bind. for real.
-var bind = function bind (fn, ctx){
-    var args = [].slice.call(arguments,2);
-
-    return function(){
-        return fn.apply(ctx, args);
-    };
-};
-
 /* global -Promise */
 var Promise = require('bluebird');
 
@@ -30,7 +21,7 @@ var PromiseSync = function (method, model, options) {
         return {};
     };
 
-    var boundSync = bind(Sync, this, method, model, options);
+    var boundSync = Sync.bind(this, method, model, options);
     // emulate syncs that implement a promise for fetch
     return Promise.resolve(boundSync());
 };
