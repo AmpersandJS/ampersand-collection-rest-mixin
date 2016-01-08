@@ -66,46 +66,51 @@ module.exports = {
         var model = this.get(id);
         if (model) {
             return window.setTimeout(function() {
-                return cb(null, model);
+	            cb(null, model);
             }, 0);
         }
-        function done() {
-            var model = self.get(id);
-            if (model) {
-                if (cb) cb(null, model);
-            } else {
-                cb(new Error('not found'));
-            }
-        }
         if (options.all) {
-            options.success = done;
-            options.error = done;
+            options.always = function() {
+	            if (!cb) return;
+            	var model = self.get(id);
+	            if (model) {
+	                cb(null, model);
+	            } else {
+	                cb(new Error('not found'));
+	            }
+	        };
             return this.fetch(options);
         } else {
-            return this.fetchById(id, cb);
+            return this.fetchById(id, options, cb);
         }
     },
 
     // fetchById: fetches a model and adds it to
     // collection when fetched.
-    fetchById: function (id, cb) {
+    fetchById: function (id, options, cb) {
+	    if (arguments.length !== 3) {
+            cb = options;
+            options = {};
+        }
         var self = this;
         var idObj = {};
         idObj[this.mainIndex] = id;
         var model = new this.model(idObj, {collection: this});
-        return model.fetch({
-            success: function () {
-                model = self.add(model);
-                if (cb) cb(null, model);
-            },
-            error: function (collection, resp) {
-                delete model.collection;
-                if (cb) {
-                    var error = new Error(resp.statusText);
-                    error.status = resp.status;
-                    cb(error);
-                }
+        
+        options.success = function () {
+            model = self.add(model);
+            if (cb) cb(null, model);
+        };
+        
+        options.error = function (collection, resp) {
+            delete model.collection;
+            if (cb) {
+                var error = new Error(resp.statusText);
+                error.status = resp.status;
+                cb(error);
             }
-        });
+        };
+        
+        return model.fetch(options);
     }
 };
