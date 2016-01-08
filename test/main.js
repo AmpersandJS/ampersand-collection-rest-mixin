@@ -35,9 +35,6 @@ var PromiseSync = function (method, model, options) {
     return Promise.resolve(boundSync());
 };
 
-
-
-
 function endAfter (t, after) {
     var count = 0;
     return function () {
@@ -66,9 +63,6 @@ var Collection = AmpersandCollection.extend(RestCollectionMixins, {
         return RestCollectionMixins.sync.apply(this, arguments);
     }
 });
-
-
-
 
 test('Existence of methods', function (t) {
     t.plan(5);
@@ -117,6 +111,29 @@ test('fetch with an error response triggers an error event', function (t) {
 
     collection.sync = function (method, model, options) { options.error(); };
     collection.fetch();
+});
+
+test('set: false - disable setting response onto collection', function(t){
+    t.plan(2);
+    var end = endAfter(t, 2);
+
+    var model = new Model({name: 'foo'});
+    var collection = new Collection();
+
+    var opts = {
+        set: false,
+        success: function (collection, resp) {
+            t.equal(collection.models.length, 0, '`set: false` does not set models on collection');
+            t.ok(resp);
+            end();
+        }
+    };
+    collection.sync = model.sync = function (method, collection, options) {
+        options.success(collection, [], options);
+    };
+
+    collection.fetch(opts);
+
 });
 
 test('ensure fetch only parses once', function (t) {
@@ -171,7 +188,7 @@ test('doing something with the result of the fetch', function(t){
     var fetchingStuff = [
         new SuccessModel().fetch(),
         new SuccessCollection().fetch(),
-        new SuccessCollection().fetchById(1), 
+        new SuccessCollection().fetchById(1),
         new SuccessCollection().getOrFetch(1)
     ];
     Promise.all(fetchingStuff).then(function(data){
@@ -363,7 +380,7 @@ test('#1939 - `parse` is passed `options`', function (t) {
             }
         },
         parse: function (data, options) {
-            t.equal(options.xhr.ajaxSettings.headers.someHeader, 'headerValue');
+            t.equal(options.xhr.headers.someheader, 'headerValue');
             t.end();
             return data;
         }
@@ -419,18 +436,61 @@ test('#15 getOrFetch call with parameters for ajax call', function (t) {
     var collection = new Collection();
     var param = {param: 'value'};
     collection.url = '/test';
-    
+
     collection.sync = function (param_method, param_collection, param_options) {
         t.equal(param_method, 'read');
         t.equal(param_collection, collection);
         t.equal(param_options.parse, true);
         t.equal(param_options.data, param);
-        
-        param_options.success(); 
+
+        param_options.success();
     };
-    
-    
+
     collection.getOrFetch(1, {all: true, data: param}, function (/*err, model*/) {
         t.end();
     });
+});
+
+test('#28 When fetchByid\'s model.fetch() returns an error, pass the error details to fetchById\'s caller', function (t) {
+    t.plan(2);
+
+    var collection = new Collection();
+
+    var options = {
+        error: function (collection, res) {
+            t.equal(res.status, 400);
+            t.equal(res.statusText, 'Bad Request');
+            t.end();
+        }
+    };
+
+    collection.sync = function (method, model, options) {
+        options.error({
+            status: 400,
+            statusText: 'Bad Request'
+        });
+    };
+    collection.fetch(options);
+});
+
+test('#13 getOrFetch call with parameters for ajax call', function (t) {
+    t.plan(2);
+
+    var collection = new Collection([{
+        id: 1
+    }]);
+
+    var syncEventCalled = false;
+
+    collection.on('sync-event', function() {
+        t.equal(syncEventCalled, false, 'synchronous event should be called first');
+        syncEventCalled = true;
+    });
+
+    collection.getOrFetch(1, function () {
+        t.equal(syncEventCalled, true, 'sync event should have been called');
+        t.end();
+    });
+
+    collection.trigger('sync-event');
 });

@@ -3,6 +3,7 @@
   "quotmark": true,
   "undef": true,
   "unused": true,
+  "browser": true,
   "trailing": true,
   "predef": [
     "require",

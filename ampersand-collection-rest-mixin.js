@@ -1,7 +1,6 @@
 /*$AMPERSAND_VERSION*/
 var sync = require('ampersand-sync');
-var extend = require('extend-object');
-
+var assign = require('lodash.assign');
 
 // Wrap an optional error callback with a fallback error event.
 var wrapError = function(model, options) {
@@ -17,25 +16,30 @@ module.exports = {
     // collection when they arrive. If `reset: true` is passed, the response
     // data will be passed through the `reset` method instead of `set`.
     fetch: function(options) {
-        options = options ? extend({}, options) : {};
+        options = options ? assign({}, options) : {};
         if (options.parse === void 0) options.parse = true;
         var success = options.success;
         var collection = this;
         options.success = function(resp) {
             var method = options.reset ? 'reset' : 'set';
-            collection[method](resp, options);
+            if (options.set !== false) collection[method](resp, options);
             if (success) success(collection, resp, options);
-            collection.trigger('sync', collection, resp, options);
+            if (options.set !== false) collection.trigger('sync', collection, resp, options);
         };
         wrapError(this, options);
-        return this.sync('read', this, options);
+        var request = this.sync('read', this, options);
+        // Make the request available on the options object so it can be accessed
+        // further down the line by `parse`, sync listeners, etc
+        // https://github.com/AmpersandJS/ampersand-collection-rest-mixin/commit/d32d788aaff912387eb1106f2d7ad183ec39e11a#diff-84c84703169bf5017b1bc323653acaa3R32
+        options.xhr = request;
+        return request;
     },
 
     // Create a new instance of a model in this collection. Add the model to the
     // collection immediately, unless `wait: true` is passed, in which case we
     // wait for the server to agree.
     create: function(model, options) {
-        options = options ? extend({}, options) : {};
+        options = options ? assign({}, options) : {};
         if (!(model = this._prepareModel(model, options))) return false;
         if (!options.wait) this.add(model, options);
         var collection = this;
@@ -54,14 +58,17 @@ module.exports = {
 
     // Get or fetch a model by Id.
     getOrFetch: function (id, options, cb) {
-
         if (arguments.length !== 3) {
             cb = options;
             options = {};
         }
         var self = this;
         var model = this.get(id);
-        if (model) return cb(null, model);
+        if (model) {
+            return window.setTimeout(function() {
+                return cb(null, model);
+            }, 0);
+        }
         function done() {
             var model = self.get(id);
             if (model) {
@@ -84,16 +91,20 @@ module.exports = {
     fetchById: function (id, cb) {
         var self = this;
         var idObj = {};
-        idObj[this.model.prototype.idAttribute] = id;
+        idObj[this.mainIndex] = id;
         var model = new this.model(idObj, {collection: this});
         return model.fetch({
             success: function () {
-                self.add(model);
+                model = self.add(model);
                 if (cb) cb(null, model);
             },
-            error: function () {
+            error: function (collection, resp) {
                 delete model.collection;
-                if (cb) cb(Error('not found'));
+                if (cb) {
+                    var error = new Error(resp.statusText);
+                    error.status = resp.status;
+                    cb(error);
+                }
             }
         });
     }
