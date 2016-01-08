@@ -21,11 +21,11 @@ module.exports = {
         
         // Wrap an optional error callback with a fallback error event.
         var error = options.error;
-	    options.error = function(resp) {
-	        if (error) error(self, resp, options);
-	        self.trigger('error', self, resp, options);
-	    };
-	    
+        options.error = function(resp) {
+            if (error) error(self, resp, options);
+            self.trigger('error', self, resp, options);
+        };
+        
         var request = this.sync('read', this, options);
         // Make the request available on the options object so it can be accessed
         // further down the line by `parse`, sync listeners, etc
@@ -70,16 +70,16 @@ module.exports = {
         }
         
         if (options.all) {
-	        //preserve original `options.always`
-	        var always = options.always;
+            //preserve original `options.always`
+            var always = options.always;
             options.always = function(err, resp, body) {
-	            if (always) always(err, resp, body);
-	            if (!cb) return;
-	            
-            	var model = self.get(id);
-            	var err2 = model ? null : new Error('not found');
-            	cb(err2, model);
-	        };
+                if (always) always(err, resp, body);
+                if (!cb) return;
+                
+                var model = self.get(id);
+                var err2 = model ? null : new Error('not found');
+                cb(err2, model);
+            };
             return this.fetch(options);
         } else {
             return this.fetchById(id, options, cb);
@@ -89,7 +89,7 @@ module.exports = {
     // fetchById: fetches a model and adds it to
     // collection when fetched.
     fetchById: function (id, options, cb) {
-	    if (arguments.length !== 3) {
+        if (arguments.length !== 3) {
             cb = options;
             options = {};
         }
