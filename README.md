@@ -15,6 +15,7 @@ npm install ampersand-collection-rest-mixin
 ## api
 
 ##### create(model, options)
+
 Create a new instance of a model in this collection. Add the model to the collection immediately.
 
 ###### options
@@ -22,6 +23,7 @@ Create a new instance of a model in this collection. Add the model to the collec
 - `wait` - default: `false`. If set to true, we wait for the server to agree before updating the collection.
 
 ##### fetch(options)
+
 Fetch the default set of models for this collection, and set them onto this collection.
 
 ###### options
@@ -30,14 +32,24 @@ Fetch the default set of models for this collection, and set them onto this coll
 - `set` [boolean] - defaut: `true`.  When left true, executes the `reset` method on the collection with server response.  When set to false, the collection will *not be modified* after the HTTP request is complete.  This enables use of of the collection strictly as an API client.  The `success` and `error` handlers are still triggered. Useful in rare circumstances.
 - `success(collection, response, options)` [function] - default: `undefined`.  Called after the XHR has completed successfully and the collection is updated.
 - `error(model, response, options)` [function] - default: `undefined`.  Called after the XHR has failed.
+- `always(err, response, body)` [function] - default: `undefined`. Called when request finishes no matter what the result.
 
-##### fetchById(id, cb)
+##### fetchById(id, options, cb)
+
 fetches a model and adds it to collection when fetched
 
 ##### getOrFetch(id, options, cb)
+
 get or fetch a model by id
 
+###### options
+
+same options as `fetch()`, with the addition of:
+
+- `all` [boolean] - default: `false`. If `true`, this fetches the entire collection and then returns the requested model.
+
 ##### sync()
+
 proxy to [ampersand-sync](AmpersandJS/ampersand-sync)
 
 ## example
