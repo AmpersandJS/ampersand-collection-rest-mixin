@@ -93,19 +93,23 @@ module.exports = {
         var idObj = {};
         idObj[this.mainIndex] = id;
         var model = new this.model(idObj, {collection: this});
-        return model.fetch({
+        
+        var xhr = model.fetch({
             success: function () {
                 model = self.add(model);
                 if (cb) cb(null, model);
             },
-            error: function (collection, resp) {
+            error: function () {
                 delete model.collection;
+                
                 if (cb) {
-                    var error = new Error(resp.statusText);
-                    error.status = resp.status;
+                    var error = new Error(xhr.statusText);
+                    error.status = xhr.status;
                     cb(error);
                 }
             }
         });
+        
+        return xhr;
     }
 };
