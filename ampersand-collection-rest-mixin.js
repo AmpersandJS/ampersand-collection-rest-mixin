@@ -2,15 +2,6 @@
 var sync = require('ampersand-sync');
 var assign = require('lodash.assign');
 
-// Wrap an optional error callback with a fallback error event.
-var wrapError = function(model, options) {
-    var error = options.error;
-    options.error = function(resp) {
-        if (error) error(model, resp, options);
-        model.trigger('error', model, resp, options);
-    };
-};
-
 module.exports = {
     // Fetch the default set of models for this collection, resetting the
     // collection when they arrive. If `reset: true` is passed, the response
@@ -18,15 +9,23 @@ module.exports = {
     fetch: function(options) {
         options = options ? assign({}, options) : {};
         if (options.parse === void 0) options.parse = true;
+        var self = this;
+        
         var success = options.success;
-        var collection = this;
         options.success = function(resp) {
             var method = options.reset ? 'reset' : 'set';
-            if (options.set !== false) collection[method](resp, options);
-            if (success) success(collection, resp, options);
-            if (options.set !== false) collection.trigger('sync', collection, resp, options);
+            if (options.set !== false) self[method](resp, options);
+            if (success) success(self, resp, options);
+            if (options.set !== false) self.trigger('sync', self, resp, options);
         };
-        wrapError(this, options);
+        
+        // Wrap an optional error callback with a fallback error event.
+        var error = options.error;
+        options.error = function(resp) {
+            if (error) error(self, resp, options);
+            self.trigger('error', self, resp, options);
+        };
+        
         var request = this.sync('read', this, options);
         // Make the request available on the options object so it can be accessed
         // further down the line by `parse`, sync listeners, etc
@@ -42,10 +41,10 @@ module.exports = {
         options = options ? assign({}, options) : {};
         if (!(model = this._prepareModel(model, options))) return false;
         if (!options.wait) this.add(model, options);
-        var collection = this;
+        var self = this;
         var success = options.success;
         options.success = function(model, resp) {
-            if (options.wait) collection.add(model, options);
+            if (options.wait) self.add(model, options);
             if (success) success(model, resp, options);
         };
         model.save(null, options);
@@ -62,54 +61,66 @@ module.exports = {
             cb = options;
             options = {};
         }
+        
         var self = this;
         var model = this.get(id);
+        
         if (model) {
-            return window.setTimeout(function() {
-                return cb(null, model);
-            }, 0);
+            return window.setTimeout(cb.bind(null, null, model), 0);
         }
-        function done() {
-            var model = self.get(id);
-            if (model) {
-                if (cb) cb(null, model);
-            } else {
-                cb(new Error('not found'));
-            }
-        }
+        
         if (options.all) {
-            options.success = done;
-            options.error = done;
+            //preserve original `options.always`
+            var always = options.always;
+            options.always = function(err, resp, body) {
+                if (always) always(err, resp, body);
+                if (!cb) return;
+                
+                var model = self.get(id);
+                var err2 = model ? null : new Error('not found');
+                cb(err2, model);
+            };
             return this.fetch(options);
         } else {
-            return this.fetchById(id, cb);
+            return this.fetchById(id, options, cb);
         }
     },
 
     // fetchById: fetches a model and adds it to
     // collection when fetched.
-    fetchById: function (id, cb) {
+    fetchById: function (id, options, cb) {
+        if (arguments.length !== 3) {
+            cb = options;
+            options = {};
+        }
+        
         var self = this;
         var idObj = {};
         idObj[this.mainIndex] = id;
         var model = new this.model(idObj, {collection: this});
         
-        var xhr = model.fetch({
-            success: function () {
-                model = self.add(model);
-                if (cb) cb(null, model);
-            },
-            error: function () {
-                delete model.collection;
-                
-                if (cb) {
-                    var error = new Error(xhr.statusText);
-                    error.status = xhr.status;
-                    cb(error);
-                }
-            }
-        });
+        //preserve original `options.success`
+        var success = options.success;
+        options.success = function (resp) {
+            model = self.add(model);
+            if (success) success(self, resp, options);
+            if (cb) cb(null, model);
+        };
         
-        return xhr;
+        //preserve original `options.error`
+        var error = options.error;
+        options.error = function (collection, resp) {
+            delete model.collection;
+            
+            if (error) error(collection, resp, options);
+            
+            if (cb) {
+                var err = new Error(resp.rawRequest.statusText);
+                err.status = resp.rawRequest.status;
+                cb(err);
+            }
+        };
+        
+        return model.fetch(options);
     }
 };
