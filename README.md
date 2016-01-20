@@ -76,4 +76,3 @@ All credit for this approach in backbone goes to Jeremy Ashkenas and the rest of
 ## license
 
 MIT
-
