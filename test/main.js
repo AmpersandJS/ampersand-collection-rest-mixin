@@ -4,6 +4,9 @@ var AmpersandCollection = require('ampersand-collection');
 var AmpersandModel = require('ampersand-model');
 var Sync = require('ampersand-sync');
 
+// Patch PhantomJS.
+if (!Function.prototype.bind) Function.prototype.bind = require('function-bind');
+
 /* global -Promise */
 var Promise = require('bluebird');
 
