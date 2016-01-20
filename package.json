@@ -23,13 +23,12 @@
     "ampersand-collection": "^1.3.15",
     "ampersand-model": "^6.0.2",
     "bluebird": "^3.1.1",
-    "browserify": "^12.0.1",
+    "function-bind": "^1.0.2",
     "jshint": "^2.5.1",
+    "phantomjs": "^1.9.19",
     "precommit-hook": "^3.0.0",
-    "run-browser": "^2.0.2",
-    "tap-spec": "^4.1.0",
     "tape": "^4.2.0",
-    "tape-run": "^2.1.0"
+    "zuul": "^3.9.0"
   },
   "homepage": "https://github.com/ampersandjs/ampersand-collection-rest-mixin",
   "keywords": [
@@ -44,8 +43,9 @@
     "url": "git://github.com/ampersandjs/ampersand-collection-rest-mixin"
   },
   "scripts": {
-    "start": "run-browser test/main.js",
-    "test": "browserify test/main.js | tape-run | tap-spec",
+    "start": "zuul --local -- test/main.js",
+    "test": "zuul --phantom -- test/main.js",
+    "test-ci": "zuul -- test/main.js",
     "lint": "jshint .",
     "validate": "npm ls"
   },
