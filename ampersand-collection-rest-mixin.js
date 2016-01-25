@@ -111,10 +111,12 @@ module.exports = {
         var error = options.error;
         options.error = function (collection, resp) {
             delete model.collection;
+            
             if (error) error(collection, resp, options);
+            
             if (cb) {
-                var err = new Error(resp.statusText);
-                err.status = resp.status;
+                var err = new Error(resp.rawRequest.statusText);
+                err.status = resp.rawRequest.status;
                 cb(err);
             }
         };
