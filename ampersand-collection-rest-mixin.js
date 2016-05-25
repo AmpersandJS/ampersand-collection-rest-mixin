@@ -1,6 +1,6 @@
 /*$AMPERSAND_VERSION*/
 var sync = require('ampersand-sync');
-var assign = require('lodash.assign');
+var assign = require('lodash/assign');
 
 module.exports = {
     // Fetch the default set of models for this collection, resetting the
